@@ -37,13 +37,10 @@ public static class CoordinateConversion
     public static Vector2Int CubeToOffset(Vector3Int hexagon)
     {
         var q = hexagon.x;
-        //TODO: fix row conversion
-        //r !< 0 || r!>rowcount
-        var r = hexagon.y + (hexagon.x - (hexagon.x & 1)) / 2;
-        if (r < 0) r = 0;
-        if (r > 10) r = 10;
+        var r = Mathf.Max(0, hexagon.y + (hexagon.x - (hexagon.x & 1)) / 2);
         return new Vector2Int(q, r);
     }
+
 
     public static Vector2Int AxielToOffset(Vector2Int hexagon)
     {
