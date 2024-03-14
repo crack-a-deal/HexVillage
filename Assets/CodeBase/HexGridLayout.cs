@@ -50,4 +50,53 @@ public class HexGridLayout : MonoBehaviour
         rowPosition *= isEvenColum ? 1 : -1;
         return new Vector2(colPosition, rowPosition);
     }
+
+    public List<Hexagon> GetNeighborsList(Vector2Int hexagonCoord)
+    {
+        List<Hexagon> neighors = new List<Hexagon>(6);
+
+        if (hexagonCoord.x % 2 == 0)
+        {
+            // even cols
+            GetEvenNeigbors(hexagonCoord, neighors);
+        }
+        else
+        {
+            // odd cols
+            GetOddNeigbors(hexagonCoord, neighors);
+        }
+
+        return neighors;
+    }
+
+
+    private void GetEvenNeigbors(Vector2Int hexagonCoord, List<Hexagon> neighors)
+    {
+        neighors.Add(GetNeighbor(new Vector2Int(hexagonCoord.x + 1, hexagonCoord.y)));
+        neighors.Add(GetNeighbor(new Vector2Int(hexagonCoord.x + 1, hexagonCoord.y - 1)));
+        neighors.Add(GetNeighbor(new Vector2Int(hexagonCoord.x, hexagonCoord.y - 1)));
+        neighors.Add(GetNeighbor(new Vector2Int(hexagonCoord.x - 1, hexagonCoord.y - 1)));
+        neighors.Add(GetNeighbor(new Vector2Int(hexagonCoord.x - 1, hexagonCoord.y)));
+        neighors.Add(GetNeighbor(new Vector2Int(hexagonCoord.x, hexagonCoord.y + 1)));
+    }
+
+    private void GetOddNeigbors(Vector2Int hexagonCoord, List<Hexagon> neighors)
+    {
+        neighors.Add(GetNeighbor(new Vector2Int(hexagonCoord.x + 1, hexagonCoord.y + 1)));
+        neighors.Add(GetNeighbor(new Vector2Int(hexagonCoord.x + 1, hexagonCoord.y)));
+        neighors.Add(GetNeighbor(new Vector2Int(hexagonCoord.x, hexagonCoord.y - 1)));
+        neighors.Add(GetNeighbor(new Vector2Int(hexagonCoord.x - 1, hexagonCoord.y)));
+        neighors.Add(GetNeighbor(new Vector2Int(hexagonCoord.x - 1, hexagonCoord.y + 1)));
+        neighors.Add(GetNeighbor(new Vector2Int(hexagonCoord.x, hexagonCoord.y + 1)));
+    }
+
+    private Hexagon GetNeighbor(Vector2Int hexagonCoord)
+    {
+        if (hexagonCoord.x < 0 || hexagonCoord.x >= columnCount)
+            return null;
+        if (hexagonCoord.y < 0 || hexagonCoord.y >= rowCount)
+            return null;
+
+        return hexagonGrid[hexagonCoord.x, hexagonCoord.y];
+    }
 }
