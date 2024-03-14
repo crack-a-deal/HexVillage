@@ -3,44 +3,75 @@ using UnityEngine;
 public class GameSession : MonoBehaviour
 {
     [SerializeField] private HexGridLayout gridLayout;
-    [SerializeField] private LineDraw lineDraw;
+    [SerializeField] private LineDrawer lineDraw;
 
-    private Hexagon selectedHexagon;
-    private Hexagon tempObj;
+    private Hexagon _selectedHexagon;
+    private Hexagon _currentHexagon;
 
     private void Start()
     {
-        foreach (var item in gridLayout.Grid)
+        foreach (var hexagon in gridLayout.Grid)
         {
-            item.SelectedCurrent += DrawLine;
-            item.Selected += SelectAllNeighbors;
+            hexagon.Selected += SelectStartHexagon;
+            hexagon.SelectedCurrent += SelectCurrentHexagon;
         }
     }
 
-    private void DrawLine(Hexagon obj)
+    private void OnDestroy()
     {
-        if (selectedHexagon == null)
+        foreach (var hexagon in gridLayout.Grid)
+        {
+            hexagon.Selected -= SelectStartHexagon;
+            hexagon.SelectedCurrent -= SelectCurrentHexagon;
+        }
+    }
+
+    private void SelectCurrentHexagon(Hexagon hexagon)
+    {
+        if (_selectedHexagon == null)
             return;
 
-        if (selectedHexagon == obj)
+        if (_selectedHexagon == hexagon)
+        {
+            lineDraw.DrawLine(_selectedHexagon, _currentHexagon, gridLayout.Grid, gridLayout.Grid[0, 0].BaseColor);
             return;
+        }
 
-        if (tempObj != null)
-            lineDraw.DrawLine(selectedHexagon, tempObj, gridLayout.Grid, gridLayout.Grid[0, 0].BaseColor);
+        DrawLine(hexagon);
+    }
 
-        lineDraw.DrawLine(selectedHexagon, obj, gridLayout.Grid, lineDraw.Color);
-        tempObj = obj;
+
+    private void SelectStartHexagon(Hexagon hexagon)
+    {
+        if (_selectedHexagon == hexagon)
+        {
+            _selectedHexagon = null;
+        }
+        else
+        {
+            _selectedHexagon = hexagon;
+            _currentHexagon = null;
+        }
+    }
+
+    private void DrawLine(Hexagon hexagon)
+    {
+        if (_currentHexagon != null)
+            lineDraw.DrawLine(_selectedHexagon, _currentHexagon, gridLayout.Grid, gridLayout.Grid[0, 0].BaseColor);
+
+        lineDraw.DrawLine(_selectedHexagon, hexagon, gridLayout.Grid, lineDraw.Color);
+        _currentHexagon = hexagon;
     }
 
     private void SelectAllNeighbors(Hexagon targetHexagon)
     {
-        if (selectedHexagon == targetHexagon)
+        if (_selectedHexagon == targetHexagon)
         {
-            selectedHexagon = null;
+            _selectedHexagon = null;
         }
         else
         {
-            selectedHexagon = targetHexagon;
+            _selectedHexagon = targetHexagon;
         }
 
         //List<Hexagon> list = gridLayout.GetNeighborsList(new Vector2Int(targetHexagon.Column, targetHexagon.Row));

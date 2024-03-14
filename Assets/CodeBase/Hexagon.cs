@@ -13,6 +13,8 @@ public class Hexagon : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler,
     public int Column { get; set; }
     public int Row { get; set; }
 
+    public Vector2Int Coordinate => new Vector2Int(Column, Row);
+
     public Color BaseColor { get; set; }
     public Color SelectionColor {  get; set; }
 
