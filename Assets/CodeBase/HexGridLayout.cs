@@ -8,7 +8,6 @@ public class HexGridLayout : MonoBehaviour
     [SerializeField] private Hexagon hexagonPrefab;
 
     [SerializeField] private bool isEvenColum = true;
-    [SerializeField] private Color evenColor;
 
     [SerializeField] private Hexagon[,] hexagonGrid;
 
@@ -68,7 +67,6 @@ public class HexGridLayout : MonoBehaviour
 
         return neighors;
     }
-
 
     private void GetEvenNeigbors(Vector2Int hexagonCoord, List<Hexagon> neighors)
     {
