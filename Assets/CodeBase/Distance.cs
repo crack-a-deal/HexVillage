@@ -3,11 +3,11 @@ using UnityEngine;
 
 public static class Distance
 {
-    public static int GetOffsetDistance(Vector2Int selected, Vector2Int target)
+    public static int GetOffsetDistance(Vector2Int first, Vector2Int second)
     {
-        Vector2Int selectedCoords = CoordinateConversion.OffsetToAxial(selected);
-        Vector2Int targetCoords = CoordinateConversion.OffsetToAxial(target);
-        return GetInlineAxialDistance(selected, target);
+        Vector2Int selectedCoords = CoordinateConversion.OffsetToAxial(first);
+        Vector2Int targetCoords = CoordinateConversion.OffsetToAxial(second);
+        return GetAxialDistance(selectedCoords, targetCoords);
     }
 
     public static int GetAxialDistance(Vector2Int first, Vector2Int second)
@@ -17,14 +17,14 @@ public static class Distance
         return GetCubeDistance(fCubeCoord, sCubeCoord);
     }
 
-    public static int GetInlineAxialDistance(Vector2Int first,Vector2Int second)
+    public static int GetInlineAxialDistance(Vector2Int first, Vector2Int second)
     {
         return (Math.Abs(first.x - second.x) + Math.Abs(first.x + first.y - second.x - second.y) + Math.Abs(first.y - second.y)) / 2;
     }
 
     public static int GetAnotherAxielDistance(Vector2Int first, Vector2Int second)
     {
-        var vec = Subtract(first, second);
+        Vector2Int vec = Subtract(first, second);
         return (Math.Abs(vec.x) + Math.Abs(vec.x + vec.y) + Math.Abs(vec.y)) / 2;
     }
 
