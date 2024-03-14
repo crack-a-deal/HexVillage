@@ -58,10 +58,6 @@ public class Hexagon : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler,
     {
         hexagonRenderer.color = color;
         return;
-        if (hexagonRenderer.color == _baseColor)
-            hexagonRenderer.color = color;
-        else
-            hexagonRenderer.color = _baseColor;
     }
 
     private void SelectHexagon()
