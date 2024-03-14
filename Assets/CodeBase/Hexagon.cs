@@ -5,20 +5,18 @@ using UnityEngine.EventSystems;
 public class Hexagon : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
     public event Action<Hexagon> Selected;
+    public event Action<Hexagon> SelectedCurrent;
 
     [SerializeField] private GameObject outline;
     [SerializeField] private SpriteRenderer hexagonRenderer;
-    [SerializeField] private Color selectedColor;
 
     public int Column { get; set; }
     public int Row { get; set; }
 
-    private Color _baseColor;
+    public Vector2Int Coordinate => new Vector2Int(Column, Row);
 
-    private void Awake()
-    {
-        _baseColor = hexagonRenderer.color;
-    }
+    public Color BaseColor { get; set; }
+    public Color SelectionColor {  get; set; }
 
     public void OnPointerClick(PointerEventData eventData)
     {
@@ -28,6 +26,7 @@ public class Hexagon : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler,
     public void OnPointerEnter(PointerEventData eventData)
     {
         ActiveOutline(true);
+        SelectedCurrent?.Invoke(this);
     }
 
     public void OnPointerExit(PointerEventData eventData)
@@ -42,10 +41,18 @@ public class Hexagon : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler,
 
     public void SetSelectionColor()
     {
-        if (hexagonRenderer.color == _baseColor)
-            hexagonRenderer.color = selectedColor;
-        else
-            hexagonRenderer.color = _baseColor;
+        SetSelectedColor(SelectionColor);
+    }
+
+    public void SetBaseColor()
+    {
+        SetSelectedColor(BaseColor);
+    }
+    
+    public void SetSelectedColor(Color color)
+    {
+        hexagonRenderer.color = color;
+        return;
     }
 
     private void SelectHexagon()
