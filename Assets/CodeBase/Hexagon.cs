@@ -9,19 +9,12 @@ public class Hexagon : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler,
 
     [SerializeField] private GameObject outline;
     [SerializeField] private SpriteRenderer hexagonRenderer;
-    [SerializeField] private Color selectedColor;
 
     public int Column { get; set; }
     public int Row { get; set; }
 
-    private Color _baseColor;
-
-    public Color BaseColor => _baseColor;
-
-    private void Awake()
-    {
-        _baseColor = hexagonRenderer.color;
-    }
+    public Color BaseColor { get; set; }
+    public Color SelectionColor {  get; set; }
 
     public void OnPointerClick(PointerEventData eventData)
     {
@@ -46,12 +39,12 @@ public class Hexagon : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler,
 
     public void SetSelectionColor()
     {
-        SetSelectedColor(selectedColor);
+        SetSelectedColor(SelectionColor);
     }
 
     public void SetBaseColor()
     {
-        SetSelectedColor(_baseColor);
+        SetSelectedColor(BaseColor);
     }
     
     public void SetSelectedColor(Color color)

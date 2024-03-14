@@ -5,11 +5,15 @@ public class HexGridLayout : MonoBehaviour
 {
     [SerializeField] private int columnCount;
     [SerializeField] private int rowCount;
-    [SerializeField] private Hexagon hexagonPrefab;
 
     [SerializeField] private bool isEvenColum = true;
 
-    [SerializeField] private Hexagon[,] hexagonGrid;
+    [Header("Hexagon Setting")]
+    [SerializeField] private Hexagon hexagonPrefab;
+    [SerializeField] private Color hexagonBaseColor;
+    [SerializeField] private Color hexagonSelectionColor;
+
+    private Hexagon[,] hexagonGrid;
 
     public Hexagon[,] Grid => hexagonGrid;
 
@@ -31,6 +35,11 @@ public class HexGridLayout : MonoBehaviour
 
                 hexagon.Column = q;
                 hexagon.Row = r;
+
+                hexagon.BaseColor = hexagonBaseColor;
+                hexagon.SelectionColor = hexagonSelectionColor;
+                hexagon.SetBaseColor();
+
                 hexagonGrid[q, r] = hexagon;
             }
         }
