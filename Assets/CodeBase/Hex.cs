@@ -42,14 +42,14 @@ public struct Hex
 
     int Distance(Hex firstHex, Hex secondHex)
     {
-        return Length(Subtract(firstHex,secondHex));
+        return Length(Subtract(firstHex, secondHex));
     }
 
     Hex HexDirection(int direction)
     {
         if (direction < 0 || direction > 5)
             throw new System.Exception("Direction index out of array");
-        
+
         Dictionary<int, Hex> keyValuePairs = new Dictionary<int, Hex>
         {
             { 0, new Hex(1, 0, -1) },
@@ -60,7 +60,7 @@ public struct Hex
             { 5, new Hex(0, 1, -1) },
         };
 
-        return keyValuePairs[direction]; 
+        return keyValuePairs[direction];
     }
 
     Hex Neighbor(Hex hex, int direction)

@@ -13,6 +13,7 @@ public class HexagonRenderer : MonoBehaviour
     public Hexagon InitHex(Vector2Int coord)
     {
         Hexagon hexagon = Instantiate(hexagonPrefab, transform);
+        hexagon.name = $"Hexagon [{coord.x},{coord.y}]";
 
         hexagon.Coordinate = coord;
         int type = GetHexType();
