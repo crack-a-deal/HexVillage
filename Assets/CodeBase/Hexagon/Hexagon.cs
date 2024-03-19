@@ -11,12 +11,14 @@ public class Hexagon : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler,
     [SerializeField] private SpriteRenderer hexagonRenderer;
 
     public int Column { get; set; }
+
     public int Row { get; set; }
 
-    public Vector2Int Coordinate => new Vector2Int(Column, Row);
+    public Vector2Int Coordinate { get => new Vector2Int(Column, Row); set { Column = value.x; Row = value.y; } }
 
     public Color BaseColor { get; set; }
-    public Color SelectionColor {  get; set; }
+
+    public Color SelectionColor { get; set; }
 
     public void OnPointerClick(PointerEventData eventData)
     {
@@ -48,7 +50,7 @@ public class Hexagon : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler,
     {
         SetSelectedColor(BaseColor);
     }
-    
+
     public void SetSelectedColor(Color color)
     {
         hexagonRenderer.color = color;

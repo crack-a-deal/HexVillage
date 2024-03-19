@@ -1,109 +1,34 @@
-using System.Collections.Generic;
 using UnityEngine;
 
-public class HexGridLayout : MonoBehaviour
+public class HexGridLayout
 {
-    [SerializeField] private int columnCount;
-    [SerializeField] private int rowCount;
+    public int Columns => _columnCount;
+    public int Rows => _rowCount;
+    public Hex[,] Grid => _grid;
 
-    [SerializeField] private bool isEvenColum = true;
+    private int _columnCount;
+    private int _rowCount;
+    private Hex[,] _grid;
 
-    [Header("Hexagon Setting")]
-    [SerializeField] private Hexagon hexagonPrefab;
-    [SerializeField] private Color hexagonBaseColor;
-    [SerializeField] private Color hexagonSelectionColor;
 
-    private Hexagon[,] hexagonGrid;
-
-    public Hexagon[,] Grid => hexagonGrid;
-
-    private void Awake()
+    public HexGridLayout(int columnCount, int rowCount)
     {
-        hexagonGrid = new Hexagon[columnCount, rowCount];
-        LayoutGrid();
+        _columnCount = columnCount;
+        _rowCount = rowCount;
     }
 
-    private void LayoutGrid()
+    public void CreateLayoutGrid()
     {
-        for (int r = 0; r < rowCount; r++)
+        _grid = new Hex[_columnCount, _rowCount];
+
+        for (int r = 0; r < _rowCount; r++)
         {
-            for (int q = 0; q < columnCount; q++)
+            for (int q = 0; q < _columnCount; q++)
             {
-                Hexagon hexagon = Instantiate(hexagonPrefab, transform);
-                hexagon.name = $"Hexagon [{q},{r}]";
-                hexagon.transform.position = GetHexagonPositionFromCoordinates(new Vector2Int(q, r)) + (Vector2)transform.position;
-
-                hexagon.Column = q;
-                hexagon.Row = r;
-
-                hexagon.BaseColor = hexagonBaseColor;
-                hexagon.SelectionColor = hexagonSelectionColor;
-                hexagon.SetBaseColor();
-
-                hexagonGrid[q, r] = hexagon;
+                Vector3Int cubeCoordinates = CoordinateConversion.OffsetToCube(new Vector2Int(q, r));
+                Hex hexq = new Hex(cubeCoordinates.x, cubeCoordinates.y, cubeCoordinates.z);
+                _grid[q, r] = hexq;
             }
         }
-    }
-
-    private Vector2 GetHexagonPositionFromCoordinates(Vector2Int coordinates)
-    {
-        int column = coordinates.x;
-        int row = coordinates.y;
-
-        bool shoutOffset = column % 2 != 0;
-        float offset = shoutOffset ? 0.45f : 0f;
-
-        float rowPosition = row + offset - (0.1f * row);
-        float colPosition = column - (column * 0.2f);
-        rowPosition *= isEvenColum ? 1 : -1;
-        return new Vector2(colPosition, rowPosition);
-    }
-
-    public List<Hexagon> GetNeighborsList(Vector2Int hexagonCoord)
-    {
-        List<Hexagon> neighors = new List<Hexagon>(6);
-
-        if (hexagonCoord.x % 2 == 0)
-        {
-            // even cols
-            GetEvenNeigbors(hexagonCoord, neighors);
-        }
-        else
-        {
-            // odd cols
-            GetOddNeigbors(hexagonCoord, neighors);
-        }
-
-        return neighors;
-    }
-
-    private void GetEvenNeigbors(Vector2Int hexagonCoord, List<Hexagon> neighors)
-    {
-        neighors.Add(GetNeighbor(new Vector2Int(hexagonCoord.x + 1, hexagonCoord.y)));
-        neighors.Add(GetNeighbor(new Vector2Int(hexagonCoord.x + 1, hexagonCoord.y - 1)));
-        neighors.Add(GetNeighbor(new Vector2Int(hexagonCoord.x, hexagonCoord.y - 1)));
-        neighors.Add(GetNeighbor(new Vector2Int(hexagonCoord.x - 1, hexagonCoord.y - 1)));
-        neighors.Add(GetNeighbor(new Vector2Int(hexagonCoord.x - 1, hexagonCoord.y)));
-        neighors.Add(GetNeighbor(new Vector2Int(hexagonCoord.x, hexagonCoord.y + 1)));
-    }
-
-    private void GetOddNeigbors(Vector2Int hexagonCoord, List<Hexagon> neighors)
-    {
-        neighors.Add(GetNeighbor(new Vector2Int(hexagonCoord.x + 1, hexagonCoord.y + 1)));
-        neighors.Add(GetNeighbor(new Vector2Int(hexagonCoord.x + 1, hexagonCoord.y)));
-        neighors.Add(GetNeighbor(new Vector2Int(hexagonCoord.x, hexagonCoord.y - 1)));
-        neighors.Add(GetNeighbor(new Vector2Int(hexagonCoord.x - 1, hexagonCoord.y)));
-        neighors.Add(GetNeighbor(new Vector2Int(hexagonCoord.x - 1, hexagonCoord.y + 1)));
-        neighors.Add(GetNeighbor(new Vector2Int(hexagonCoord.x, hexagonCoord.y + 1)));
-    }
-
-    private Hexagon GetNeighbor(Vector2Int hexagonCoord)
-    {
-        if (hexagonCoord.x < 0 || hexagonCoord.x >= columnCount)
-            return null;
-        if (hexagonCoord.y < 0 || hexagonCoord.y >= rowCount)
-            return null;
-
-        return hexagonGrid[hexagonCoord.x, hexagonCoord.y];
     }
 }

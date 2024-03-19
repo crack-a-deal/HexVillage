@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class GameSession : MonoBehaviour
 {
-    [SerializeField] private HexGridLayout gridLayout;
+    [SerializeField] private HexGridLayoutRenderer gridLayout;
     [SerializeField] private LineDrawer lineDraw;
 
     private Hexagon _selectedHexagon;
@@ -10,7 +10,7 @@ public class GameSession : MonoBehaviour
 
     private void Start()
     {
-        foreach (var hexagon in gridLayout.Grid)
+        foreach (Hexagon hexagon in gridLayout.Grid)
         {
             hexagon.Selected += SelectStartHexagon;
             hexagon.SelectedCurrent += SelectCurrentHexagon;
@@ -19,7 +19,7 @@ public class GameSession : MonoBehaviour
 
     private void OnDestroy()
     {
-        foreach (var hexagon in gridLayout.Grid)
+        foreach (Hexagon hexagon in gridLayout.Grid)
         {
             hexagon.Selected -= SelectStartHexagon;
             hexagon.SelectedCurrent -= SelectCurrentHexagon;
