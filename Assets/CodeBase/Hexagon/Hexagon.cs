@@ -4,62 +4,63 @@ using UnityEngine.EventSystems;
 
 public class Hexagon : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
-    public event Action<Hexagon> Selected;
-    public event Action<Hexagon> SelectedCurrent;
+    public event Action<Hexagon> Select;
+    public event Action<Hexagon> PointerEnter;
+    public event Action<Hexagon> PointerExit;
 
     [SerializeField] private GameObject outline;
     [SerializeField] private SpriteRenderer hexagonRenderer;
 
-    public int Column { get; set; }
+    public Hex HexData { get; set; }
+    public Vector2Int Coordinate => CoordinateConversion.CubeToOffset(new Vector3Int(HexData.Q, HexData.R, HexData.S));
 
-    public int Row { get; set; }
-
-    public Vector2Int Coordinate { get => new Vector2Int(Column, Row); set { Column = value.x; Row = value.y; } }
-
-    public Color BaseColor { get; set; }
-
-    public Color SelectionColor { get; set; }
-
-    public void OnPointerClick(PointerEventData eventData)
+    private Color _defaultColor;
+    public Color DefaultColor
     {
-        SelectHexagon();
+        get => _defaultColor;
+        set
+        {
+            _defaultColor = value;
+            BaseColor = _defaultColor;
+            TempColor = _defaultColor;
+        }
     }
+    public Color BaseColor { get; set; }
+    public Color TempColor { get; set; }
 
+    #region Pointers
     public void OnPointerEnter(PointerEventData eventData)
     {
         ActiveOutline(true);
-        SelectedCurrent?.Invoke(this);
+        PointerEnter?.Invoke(this);
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        Select?.Invoke(this);
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
         ActiveOutline(false);
+        PointerExit?.Invoke(this);
     }
+    #endregion
 
     private void ActiveOutline(bool isActive)
     {
         outline.SetActive(isActive);
     }
 
-    public void SetSelectionColor()
+    public void SetTempColor(Color color)
     {
-        SetSelectedColor(SelectionColor);
-    }
-
-    public void SetBaseColor()
-    {
-        SetSelectedColor(BaseColor);
-    }
-
-    public void SetSelectedColor(Color color)
-    {
+        TempColor = color;
         hexagonRenderer.color = color;
-        return;
     }
 
-    private void SelectHexagon()
+    public void SetBaseColor(Color color)
     {
-        SetSelectionColor();
-        Selected?.Invoke(this);
+        BaseColor = color;
+        hexagonRenderer.color = color;
     }
 }
