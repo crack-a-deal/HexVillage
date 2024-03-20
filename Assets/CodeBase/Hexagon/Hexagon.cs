@@ -4,36 +4,35 @@ using UnityEngine.EventSystems;
 
 public class Hexagon : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
-    public event Action<Hexagon> Selected;
-    public event Action<Hexagon> SelectedCurrent;
+    public event Action<Hexagon> Select;
+    public event Action<Hexagon> PointerEnter;
+    public event Action<Hexagon> PointerExit;
 
     [SerializeField] private GameObject outline;
     [SerializeField] private SpriteRenderer hexagonRenderer;
 
-    public int Column { get; set; }
-
-    public int Row { get; set; }
-
-    public Vector2Int Coordinate { get => new Vector2Int(Column, Row); set { Column = value.x; Row = value.y; } }
-
+    public Hex HexData { get; set; }
+    public Vector2Int Coordinate => CoordinateConversion.CubeToOffset(new Vector3Int(HexData.Q, HexData.R, HexData.S));
     public Color BaseColor { get; set; }
 
     public Color SelectionColor { get; set; }
-
-    public void OnPointerClick(PointerEventData eventData)
-    {
-        SelectHexagon();
-    }
+    public Color CurrentColor { get; set; }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
         ActiveOutline(true);
-        SelectedCurrent?.Invoke(this);
+        PointerEnter?.Invoke(this);
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        Select?.Invoke(this);
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
         ActiveOutline(false);
+        PointerExit?.Invoke(this);
     }
 
     private void ActiveOutline(bool isActive)
@@ -43,23 +42,18 @@ public class Hexagon : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler,
 
     public void SetSelectionColor()
     {
-        SetSelectedColor(SelectionColor);
+        ChangeColor(SelectionColor);
     }
 
     public void SetBaseColor()
     {
-        SetSelectedColor(BaseColor);
+        ChangeColor(BaseColor);
     }
 
-    public void SetSelectedColor(Color color)
+    public void ChangeColor(Color color)
     {
+        CurrentColor = color;
         hexagonRenderer.color = color;
         return;
-    }
-
-    private void SelectHexagon()
-    {
-        SetSelectionColor();
-        Selected?.Invoke(this);
     }
 }
