@@ -13,11 +13,22 @@ public class Hexagon : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler,
 
     public Hex HexData { get; set; }
     public Vector2Int Coordinate => CoordinateConversion.CubeToOffset(new Vector3Int(HexData.Q, HexData.R, HexData.S));
+
+    private Color _defaultColor;
+    public Color DefaultColor
+    {
+        get => _defaultColor;
+        set
+        {
+            _defaultColor = value;
+            BaseColor = _defaultColor;
+            TempColor = _defaultColor;
+        }
+    }
     public Color BaseColor { get; set; }
+    public Color TempColor { get; set; }
 
-    public Color SelectionColor { get; set; }
-    public Color CurrentColor { get; set; }
-
+    #region Pointers
     public void OnPointerEnter(PointerEventData eventData)
     {
         ActiveOutline(true);
@@ -34,26 +45,22 @@ public class Hexagon : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler,
         ActiveOutline(false);
         PointerExit?.Invoke(this);
     }
+    #endregion
 
     private void ActiveOutline(bool isActive)
     {
         outline.SetActive(isActive);
     }
 
-    public void SetSelectionColor()
+    public void SetTempColor(Color color)
     {
-        ChangeColor(SelectionColor);
-    }
-
-    public void SetBaseColor()
-    {
-        ChangeColor(BaseColor);
-    }
-
-    public void ChangeColor(Color color)
-    {
-        CurrentColor = color;
+        TempColor = color;
         hexagonRenderer.color = color;
-        return;
+    }
+
+    public void SetBaseColor(Color color)
+    {
+        BaseColor = color;
+        hexagonRenderer.color = color;
     }
 }

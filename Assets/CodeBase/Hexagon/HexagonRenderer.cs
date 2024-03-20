@@ -7,7 +7,6 @@ public class HexagonRenderer : MonoBehaviour
     [Header("Hexagon Setting")]
     [SerializeField] private Hexagon hexagonPrefab;
     [SerializeField] private Color hexagonBaseColor;
-    [SerializeField] private Color hexagonSelectionColor;
 
     [Space]
     [SerializeField] private HexagonColor[] hexagonTypes;
@@ -23,15 +22,30 @@ public class HexagonRenderer : MonoBehaviour
     {
         Hexagon hexagon = Instantiate(hexagonPrefab, transform);
         hexagon.name = $"Hexagon [{coord.x},{coord.y}]";
-        hexagon.BaseColor = hexagonTypes[0].BaseColor;
-        hexagon.SelectionColor = hexagonSelectionColor;
-        hexagon.SetBaseColor();
+
+        hexagon.DefaultColor = hexagonTypes[0].BaseColor;
+        hexagon.SetTempColor(hexagon.DefaultColor);
         return hexagon;
     }
 
-    public void ChangeHexagonColor(Hexagon hex, Color color)
+    public void ChangeTempHexagonColor(Hexagon hex, Color color)
     {
-        hex.ChangeColor(color);
+        hex.SetTempColor(color);
+    }
+
+    public void ChangeBaseHexagonColor(Hexagon hex, Color baseColor)
+    {
+        hex.SetBaseColor(baseColor);
+    }
+
+    public void ClearToDefaultColor(Hexagon hex)
+    {
+        hex.SetBaseColor(hex.DefaultColor);
+    }
+
+    public void ClearToBaseColor(Hexagon hex)
+    {
+        hex.SetTempColor(hex.BaseColor);
     }
 
     public Color GetColorFromType(HexagonType type)

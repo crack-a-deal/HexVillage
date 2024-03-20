@@ -5,7 +5,6 @@ public class HexGridDrawer : MonoBehaviour
 {
     public event Action<Color> OnCurrentColorChanged;
 
-    // TODO: line drawer
     // TODO: start point drawer
     // TODO: end point drawer
 
@@ -13,6 +12,9 @@ public class HexGridDrawer : MonoBehaviour
     [SerializeField] private LineDrawer lineDrawer;
     [SerializeField] private DrawerToolsPanel toolsPanel;
 
+    [SerializeField] private bool isDrawLine = false;
+    private Hexagon _startHex;
+    private Hexagon _endHex;
 
     private Hexagon _selectedHexagon;
     public Hexagon SelectedHexagon
@@ -62,6 +64,7 @@ public class HexGridDrawer : MonoBehaviour
     {
         toolsPanel.ClearField += ToolsPanel_ClearField;
         toolsPanel.ChangeHexagonType += ToolsPanel_ChangeHexagonType;
+        toolsPanel.DrawLine += ToolsPanel_DrawLine;
     }
 
     private void Start()
@@ -69,18 +72,53 @@ public class HexGridDrawer : MonoBehaviour
         foreach (Hexagon hex in gridRenderer.Grid)
         {
             hex.Select += Hex_Select;
+            hex.PointerEnter += Hex_PointerEnter;
+        }
+    }
+
+    private void Hex_PointerEnter(Hexagon hex)
+    {
+        if (isDrawLine)
+        {
+            if(_startHex != null)
+            {
+                _endHex = hex;
+                gridRenderer.DrawLine(lineDrawer.GetLinePath(_startHex, _endHex), CurrentColor);
+            }
         }
     }
 
     private void Hex_Select(Hexagon hex)
     {
-        _selectedHexagon = hex;
-        gridRenderer.ChangeHexColor(hex,CurrentColor);
+        if (isDrawLine)
+        {
+            if (_startHex == null)
+            {
+                _startHex = hex;
+                return;
+            }
+            if(_startHex != null && _endHex != null)
+            {
+                gridRenderer.DrawBaseLine(lineDrawer.GetLinePath(_startHex, _endHex), CurrentColor);
+                _startHex = null;
+                _endHex = null;
+            }
+        }
+        else
+        {
+            _selectedHexagon = hex;
+            gridRenderer.ChangeBaseHexColor(hex, CurrentColor);
+        }
     }
 
     private void ToolsPanel_ClearField()
     {
-        gridRenderer.Clear();
+        gridRenderer.ClearToDefault();
+    }
+
+    private void ToolsPanel_DrawLine()
+    {
+        isDrawLine = !isDrawLine;
     }
 
     private void ToolsPanel_ChangeHexagonType(HexagonType type)
