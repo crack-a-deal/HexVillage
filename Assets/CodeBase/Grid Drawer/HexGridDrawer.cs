@@ -10,9 +10,12 @@ public class HexGridDrawer : MonoBehaviour
 
     [SerializeField] private HexGridLayoutRenderer gridRenderer;
     [SerializeField] private LineDrawer lineDrawer;
+    [SerializeField] private HexPathfinder pathfinder;
     [SerializeField] private DrawerToolsPanel toolsPanel;
 
     [SerializeField] private bool isDrawLine = false;
+    [SerializeField] private bool isPathfinding = false;
+
     private Hexagon _startHex;
     private Hexagon _endHex;
 
@@ -65,6 +68,22 @@ public class HexGridDrawer : MonoBehaviour
         toolsPanel.ClearField += ToolsPanel_ClearField;
         toolsPanel.ChangeHexagonType += ToolsPanel_ChangeHexagonType;
         toolsPanel.DrawLine += ToolsPanel_DrawLine;
+        toolsPanel.FindPath += ToolsPanel_FindPath;
+
+        gridRenderer.UpdateGridLayout += GridRenderer_UpdateGridLayout;
+        pathfinder.OnPathFound += Pathfinder_OnPathFound;
+    }
+
+    private void Pathfinder_OnPathFound()
+    {
+        gridRenderer.DrawBaseLine(pathfinder.GetPath(), CurrentColor);
+    }
+
+    private void GridRenderer_UpdateGridLayout()
+    {
+        if (!isPathfinding)
+            return;
+
     }
 
     private void Start()
@@ -80,10 +99,17 @@ public class HexGridDrawer : MonoBehaviour
     {
         if (isDrawLine)
         {
-            if(_startHex != null)
+            if (_startHex != null)
             {
                 _endHex = hex;
                 gridRenderer.DrawLine(lineDrawer.GetLinePath(_startHex, _endHex), CurrentColor);
+            }
+        }
+        else if (isPathfinding)
+        {
+            if (_startHex != null)
+            {
+                _endHex = hex;
             }
         }
     }
@@ -97,9 +123,24 @@ public class HexGridDrawer : MonoBehaviour
                 _startHex = hex;
                 return;
             }
-            if(_startHex != null && _endHex != null)
+            if (_startHex != null && _endHex != null)
             {
-                gridRenderer.DrawBaseLine(lineDrawer.GetLinePath(_startHex, _endHex), CurrentColor);
+                _startHex = null;
+                _endHex = null;
+            }
+        }
+        else if (isPathfinding)
+        {
+            if (_startHex == null)
+            {
+                _startHex = hex;
+                return;
+            }
+            if (_startHex != null && _endHex != null)
+            {
+                pathfinder.SetDestination(_startHex, _endHex);
+                gridRenderer.DrawBaseLine(pathfinder.GetPath(), CurrentColor);
+
                 _startHex = null;
                 _endHex = null;
             }
@@ -119,6 +160,11 @@ public class HexGridDrawer : MonoBehaviour
     private void ToolsPanel_DrawLine()
     {
         isDrawLine = !isDrawLine;
+    }
+
+    private void ToolsPanel_FindPath()
+    {
+        isPathfinding = !isPathfinding;
     }
 
     private void ToolsPanel_ChangeHexagonType(HexagonType type)

@@ -1,9 +1,13 @@
+using GameAI.PathFinding;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(HexagonRenderer))]
 public class HexGridLayoutRenderer : MonoBehaviour
 {
+    public event Action UpdateGridLayout;
+
     [Header("Grid Size")]
     [SerializeField] private int columnCount;
     [SerializeField] private int rowCount;
@@ -15,9 +19,13 @@ public class HexGridLayoutRenderer : MonoBehaviour
     public Hexagon[,] Grid => _grid;
     private Hexagon[,] _grid;
 
+    public HexNode[,] HexGrid => _hexGrid;
+    private HexNode[,] _hexGrid;
+
     private void Awake()
     {
         gridLayout = new HexGridLayout(columnCount, rowCount);
+        _hexGrid = new HexNode[columnCount, rowCount];
         gridLayout.CreateLayoutGrid();
         RenderGrid();
     }
@@ -33,7 +41,9 @@ public class HexGridLayoutRenderer : MonoBehaviour
             hexagon.HexData = hex;
             hexagon.transform.position = GetHexagonPositionFromCoordinates(offsetCoordination) + (Vector2)transform.position;
             _grid[offsetCoordination.x, offsetCoordination.y] = hexagon;
+            _hexGrid[offsetCoordination.x, offsetCoordination.y] = new HexNode(this, _grid[offsetCoordination.x,offsetCoordination.y],offsetCoordination);
         }
+        UpdateGridLayout?.Invoke();
     }
 
     private Vector2 GetHexagonPositionFromCoordinates(Vector2Int coordinates)
@@ -56,6 +66,7 @@ public class HexGridLayoutRenderer : MonoBehaviour
         {
             hexagonRenderer.ClearToBaseColor(hex);
         }
+        UpdateGridLayout?.Invoke();
     }
 
     public void ClearToDefault()
@@ -64,16 +75,19 @@ public class HexGridLayoutRenderer : MonoBehaviour
         {
             hexagonRenderer.ClearToDefaultColor(hex);
         }
+        UpdateGridLayout?.Invoke();
     }
 
     public void ChangeTempHexColor(Hexagon hex, Color color)
     {
         hexagonRenderer.ChangeTempHexagonColor(hex, color);
+        UpdateGridLayout?.Invoke();
     }
 
-    public void ChangeBaseHexColor(Hexagon hex,Color color)
+    public void ChangeBaseHexColor(Hexagon hex, Color color)
     {
         hexagonRenderer.ChangeBaseHexagonColor(hex, color);
+        UpdateGridLayout?.Invoke();
     }
 
     public Color GetColor(HexagonType type) => hexagonRenderer.GetColorFromType(type);
@@ -83,7 +97,8 @@ public class HexGridLayoutRenderer : MonoBehaviour
         ClearFrame();
         foreach (var hex in path)
         {
-            ChangeTempHexColor(_grid[hex.x,hex.y], color);
+            // TODO: fix IndexOutOfRangeException
+            ChangeTempHexColor(_grid[hex.x, hex.y], color);
         }
     }
     public void DrawBaseLine(List<Vector2Int> path, Color color)
@@ -92,5 +107,54 @@ public class HexGridLayoutRenderer : MonoBehaviour
         {
             ChangeBaseHexColor(_grid[hex.x, hex.y], color);
         }
+    }
+
+    public List<Node<Vector2Int>> GetNeighborsList(HexNode hexNode)
+    {
+        List<Node<Vector2Int>> result = new List<Node<Vector2Int>>(6);
+
+        if (hexNode.hexagon.Coordinate.x % 2 == 0)
+        {
+            // even cols
+            GetEvenNeigbors(hexNode.hexagon.Coordinate, result);
+        }
+        else
+        {
+            // odd cols
+            GetOddNeigbors(hexNode.hexagon.Coordinate, result);
+        }
+        result.RemoveAll(item => item == null);
+
+        return result;
+    }
+
+    private void GetEvenNeigbors(Vector2Int hexagonCoord, List<Node<Vector2Int>> neighors)
+    {
+        neighors.Add(GetNeighbor(new Vector2Int(hexagonCoord.x + 1, hexagonCoord.y)));
+        neighors.Add(GetNeighbor(new Vector2Int(hexagonCoord.x + 1, hexagonCoord.y - 1)));
+        neighors.Add(GetNeighbor(new Vector2Int(hexagonCoord.x, hexagonCoord.y - 1)));
+        neighors.Add(GetNeighbor(new Vector2Int(hexagonCoord.x - 1, hexagonCoord.y - 1)));
+        neighors.Add(GetNeighbor(new Vector2Int(hexagonCoord.x - 1, hexagonCoord.y)));
+        neighors.Add(GetNeighbor(new Vector2Int(hexagonCoord.x, hexagonCoord.y + 1)));
+    }
+
+    private void GetOddNeigbors(Vector2Int hexagonCoord, List<Node<Vector2Int>> neighors)
+    {
+        neighors.Add(GetNeighbor(new Vector2Int(hexagonCoord.x + 1, hexagonCoord.y + 1)));
+        neighors.Add(GetNeighbor(new Vector2Int(hexagonCoord.x + 1, hexagonCoord.y)));
+        neighors.Add(GetNeighbor(new Vector2Int(hexagonCoord.x, hexagonCoord.y - 1)));
+        neighors.Add(GetNeighbor(new Vector2Int(hexagonCoord.x - 1, hexagonCoord.y)));
+        neighors.Add(GetNeighbor(new Vector2Int(hexagonCoord.x - 1, hexagonCoord.y + 1)));
+        neighors.Add(GetNeighbor(new Vector2Int(hexagonCoord.x, hexagonCoord.y + 1)));
+    }
+
+    private Node<Vector2Int> GetNeighbor(Vector2Int hexagonCoord)
+    {
+        if (hexagonCoord.x < 0 || hexagonCoord.x >= columnCount)
+            return null;
+        if (hexagonCoord.y < 0 || hexagonCoord.y >= rowCount)
+            return null;
+
+        return _hexGrid[hexagonCoord.x, hexagonCoord.y];
     }
 }

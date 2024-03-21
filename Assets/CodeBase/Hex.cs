@@ -17,11 +17,13 @@ public struct Hex
         S = s;
     }
 
+    //TODO: use + operator
     Hex Add(Hex firstHex, Hex secondHex)
     {
         return new Hex(firstHex.Q + secondHex.Q, firstHex.R + secondHex.R, firstHex.S + secondHex.S);
     }
 
+    //TODO: use - operator
     Hex Subtract(Hex firstHex, Hex secondHex)
     {
         return new Hex(firstHex.Q - secondHex.Q, firstHex.R - secondHex.R, firstHex.S - secondHex.S);
@@ -32,20 +34,12 @@ public struct Hex
         return ((Mathf.Abs(hex.Q) + Mathf.Abs(hex.R) + Mathf.Abs(hex.S)) / 2);
     }
 
-    //TODO: pick one method for calculate distance between two hexes
-
-    //int Distance(Hex a, Hex b)
-    //{
-    //    Hex vec = Subtract(a, b);
-    //    return Mathf.Max(Mathf.Abs(vec.Q), Mathf.Abs(vec.R), Mathf.Abs(vec.S));
-    //}
-
     int Distance(Hex firstHex, Hex secondHex)
     {
         return Length(Subtract(firstHex, secondHex));
     }
 
-    Hex HexDirection(int direction)
+    public static Hex HexDirection(int direction)
     {
         if (direction < 0 || direction > 5)
             throw new System.Exception("Direction index out of array");
@@ -63,9 +57,19 @@ public struct Hex
         return keyValuePairs[direction];
     }
 
-    Hex Neighbor(Hex hex, int direction)
+    public static Hex Neighbor(Hex hex, int direction)
     {
         return hex.Add(hex, HexDirection(direction));
+    }
+
+    public static Hex[] Neighbors(Hex hex)
+    {
+        Hex[] result = new Hex[6];
+        for (int i = 0; i < 6; i++)
+        {
+            result[i]=hex.Add(hex,HexDirection(i));
+        }
+        return result;
     }
 
     public override bool Equals(object obj)
