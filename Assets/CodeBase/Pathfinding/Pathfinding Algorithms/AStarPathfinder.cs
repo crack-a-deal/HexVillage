@@ -6,19 +6,19 @@ namespace GameAI
     {
         public class AStarPathfinder<T> : BasePathfinder<T>
         {
-            protected override void AlgorithmSpecificImplementation(BaseNode<T> cell)
+            protected override void AlgorithmSpecificImplementation(BaseNode<T> node)
             {
-                if (IsInList(ClosedList, cell.Value) == -1)
+                if (IsInList(ClosedList, node.Value) == -1)
                 {
                     float G = CurrentNode.GCost + NodeTraversalCost(
-                        CurrentNode.Location.Value, cell.Value);
+                        CurrentNode.Location.Value, node.Value);
 
-                    float H = HeuristicCost(cell.Value, Goal.Value);
+                    float H = HeuristicCost(node.Value, Goal.Value);
 
-                    int idOList = IsInList(OpenList, cell.Value);
+                    int idOList = IsInList(OpenList, node.Value);
                     if (idOList == -1)
                     {
-                        PathfinderNode<T> n = new PathfinderNode<T>(cell, CurrentNode, G, H);
+                        PathfinderNode<T> n = new PathfinderNode<T>(node, CurrentNode, G, H);
                         OpenList.Add(n);
                     }
                     else
