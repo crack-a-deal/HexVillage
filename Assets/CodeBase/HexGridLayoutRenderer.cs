@@ -1,4 +1,5 @@
 using Pathfinding.BasePathfinding;
+using Pathfinding.HexPathfinding;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -14,35 +15,33 @@ public class HexGridLayoutRenderer : MonoBehaviour
 
     [Space]
     [SerializeField] private HexagonRenderer hexagonRenderer;
-    public HexGridLayout gridLayout;
+    private HexGridLayout _gridLayout;
 
-    public Hexagon[,] Grid => _grid;
-    private Hexagon[,] _grid;
+    public Hexagon[,] Grid => _hexagonsGrid;
+    private Hexagon[,] _hexagonsGrid;
 
-
-    public HexNode[,] HexGrid => _hexGrid;
-    private HexNode[,] _hexGrid;
+    private HexNode[,] _nodesGrid;
 
     private void Awake()
     {
-        gridLayout = new HexGridLayout(columnCount, rowCount);
-        _hexGrid = new HexNode[columnCount, rowCount];
-        gridLayout.CreateLayoutGrid();
+        _gridLayout = new HexGridLayout(columnCount, rowCount);
+        _nodesGrid = new HexNode[columnCount, rowCount];
+        _gridLayout.CreateLayoutGrid();
         RenderGrid();
     }
 
     private void RenderGrid()
     {
-        _grid = new Hexagon[columnCount, rowCount];
+        _hexagonsGrid = new Hexagon[columnCount, rowCount];
 
-        foreach (Hex hex in gridLayout.Grid)
+        foreach (Hex hex in _gridLayout.Grid)
         {
             Vector2Int offsetCoordination = CoordinateConversion.CubeToOffset(new Vector3Int(hex.Q, hex.R, hex.S));
             Hexagon hexagon = hexagonRenderer.InitHex(offsetCoordination);
             hexagon.HexData = hex;
             hexagon.transform.position = GetHexagonPositionFromCoordinates(offsetCoordination) + (Vector2)transform.position;
-            _grid[offsetCoordination.x, offsetCoordination.y] = hexagon;
-            _hexGrid[offsetCoordination.x, offsetCoordination.y] = new HexNode(this, _grid[offsetCoordination.x, offsetCoordination.y], offsetCoordination);
+            _hexagonsGrid[offsetCoordination.x, offsetCoordination.y] = hexagon;
+            _nodesGrid[offsetCoordination.x, offsetCoordination.y] = new HexNode(this, _hexagonsGrid[offsetCoordination.x, offsetCoordination.y], offsetCoordination);
         }
         UpdateGridLayout?.Invoke();
     }
@@ -63,7 +62,7 @@ public class HexGridLayoutRenderer : MonoBehaviour
 
     public void ClearFrame()
     {
-        foreach (Hexagon hex in _grid)
+        foreach (Hexagon hex in _hexagonsGrid)
         {
             hexagonRenderer.ClearToBaseColor(hex);
         }
@@ -72,7 +71,7 @@ public class HexGridLayoutRenderer : MonoBehaviour
 
     public void ClearToDefault()
     {
-        foreach (Hexagon hex in _grid)
+        foreach (Hexagon hex in _hexagonsGrid)
         {
             hexagonRenderer.ClearToDefaultColor(hex);
         }
@@ -99,14 +98,14 @@ public class HexGridLayoutRenderer : MonoBehaviour
         foreach (var hex in path)
         {
             // TODO: fix IndexOutOfRangeException
-            ChangeTempHexColor(_grid[hex.x, hex.y], color);
+            ChangeTempHexColor(_hexagonsGrid[hex.x, hex.y], color);
         }
     }
     public void DrawBaseLine(List<Vector2Int> path, Color color)
     {
         foreach (var hex in path)
         {
-            ChangeBaseHexColor(_grid[hex.x, hex.y], color);
+            ChangeBaseHexColor(_hexagonsGrid[hex.x, hex.y], color);
         }
     }
 
@@ -158,11 +157,11 @@ public class HexGridLayoutRenderer : MonoBehaviour
             return null;
         }
 
-        if (!_grid[hexagonCoord.x, hexagonCoord.y].IsWalkable)
+        if (!_hexagonsGrid[hexagonCoord.x, hexagonCoord.y].IsWalkable)
         {
             return null;
         }
 
-        return _hexGrid[hexagonCoord.x, hexagonCoord.y];
+        return _nodesGrid[hexagonCoord.x, hexagonCoord.y];
     }
 }
