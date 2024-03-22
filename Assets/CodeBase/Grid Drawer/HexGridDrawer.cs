@@ -1,3 +1,4 @@
+using Pathfinding.HexPathfinding;
 using System;
 using UnityEngine;
 
@@ -121,6 +122,7 @@ public class HexGridDrawer : MonoBehaviour
             }
             if (_startHex != null && _endHex != null)
             {
+                gridRenderer.DrawBaseLine(lineDrawer.GetLinePath(_startHex, _endHex), CurrentColor);
                 _startHex = null;
                 _endHex = null;
             }
