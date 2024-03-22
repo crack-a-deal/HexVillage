@@ -4,27 +4,24 @@ using UnityEngine;
 
 public class LineDrawer : MonoBehaviour
 {
-    [SerializeField] private Color lineColor;
-
-    public Color Color => lineColor;
-
-    public void DrawLine(Hexagon startHexagon, Hexagon targetHexagon, Hexagon[,] hexesGrid, Color color)
+    public List<Vector2Int> GetLinePath(Hexagon startHexagon, Hexagon targetHexagon)
     {
         int distanceBetweenHexes = Distance.GetOffsetDistance(startHexagon.Coordinate, targetHexagon.Coordinate);
         List<Vector3Int> hexesPositions = CalculateHexPath(startHexagon, targetHexagon, distanceBetweenHexes);
-
+        List<Vector2Int> result = new List<Vector2Int>(distanceBetweenHexes);
         foreach (var position in hexesPositions)
         {
             Vector2Int offsetCoordinates = CoordinateConversion.CubeToOffset(position);
-            hexesGrid[offsetCoordinates.x, offsetCoordinates.y].SetSelectedColor(color);
+            result.Add(offsetCoordinates);
         }
+        return result;
     }
 
     private List<Vector3Int> CalculateHexPath(Hexagon startHexagon, Hexagon targetHexagon, int distanceBetweenHexes)
     {
         List<Vector3Int> positions = new List<Vector3Int>(distanceBetweenHexes + 1);
-        Vector3Int startCoordinates = CoordinateConversion.OffsetToCube(new Vector2Int(startHexagon.Column, startHexagon.Row));
-        Vector3Int targetCoordinates = CoordinateConversion.OffsetToCube(new Vector2Int(targetHexagon.Column, targetHexagon.Row));
+        Vector3Int startCoordinates = CoordinateConversion.OffsetToCube(new Vector2Int(startHexagon.Coordinate.x, startHexagon.Coordinate.y));
+        Vector3Int targetCoordinates = CoordinateConversion.OffsetToCube(new Vector2Int(targetHexagon.Coordinate.x, targetHexagon.Coordinate.y));
 
         for (int i = 0; i <= distanceBetweenHexes; i++)
         {
