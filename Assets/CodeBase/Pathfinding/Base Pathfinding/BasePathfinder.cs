@@ -4,20 +4,20 @@ namespace Pathfinding.BasePathfinding
 {
     public abstract class BasePathfinder<T>
     {
+        public PathfinderStatus Status { get; private set; } = PathfinderStatus.NOT_INITIALIZED;
+        public BaseNode<T> Start { get; private set; }
+        public BaseNode<T> Goal { get; private set; }
+        public PathfinderNode<T> CurrentNode { get; private set; }
+
+        #region Delegates
         public delegate float CostFunction(T a, T b);
         public CostFunction HeuristicCost { get; set; }
         public CostFunction NodeTraversalCost { get; set; }
 
-        public PathfinderStatus Status { get; private set; } = PathfinderStatus.NOT_INITIALIZED;
-
-        public BaseNode<T> Start { get; private set; }
-        public BaseNode<T> Goal { get; private set; }
-
-        public PathfinderNode<T> CurrentNode { get; private set; }
-
         public delegate void DelegateNoArgument();
         public DelegateNoArgument onFailure;
         public DelegateNoArgument onSuccess;
+        #endregion
 
         protected List<PathfinderNode<T>> OpenList = new List<PathfinderNode<T>>();
         protected List<PathfinderNode<T>> ClosedList = new List<PathfinderNode<T>>();
@@ -46,7 +46,7 @@ namespace Pathfinding.BasePathfinding
 
             return true;
         }
-        
+
         public PathfinderStatus Step()
         {
             ClosedList.Add(CurrentNode);
@@ -96,33 +96,33 @@ namespace Pathfinding.BasePathfinding
             Status = PathfinderStatus.NOT_INITIALIZED;
         }
 
-        protected PathfinderNode<T> GetLeastCostNode(List<PathfinderNode<T>> myList)
+        protected PathfinderNode<T> GetLeastCostNode(List<PathfinderNode<T>> list)
         {
             int best_index = 0;
-            float best_priority = myList[0].Fcost;
-            for (int i = 1; i < myList.Count; i++)
+            float best_priority = list[0].Fcost;
+            for (int i = 1; i < list.Count; i++)
             {
-                if (best_priority > myList[i].Fcost)
+                if (best_priority > list[i].Fcost)
                 {
-                    best_priority = myList[i].Fcost;
+                    best_priority = list[i].Fcost;
                     best_index = i;
                 }
             }
 
-            PathfinderNode<T> n = myList[best_index];
+            PathfinderNode<T> n = list[best_index];
             return n;
         }
 
-        protected int IsInList(List<PathfinderNode<T>> myList, T cell)
+        protected int IsInList(List<PathfinderNode<T>> list, T node)
         {
-            for (int i = 0; i < myList.Count; ++i)
+            for (int i = 0; i < list.Count; ++i)
             {
-                if (EqualityComparer<T>.Default.Equals(myList[i].Location.Value, cell))
+                if (EqualityComparer<T>.Default.Equals(list[i].Location.Value, node))
                     return i;
             }
             return -1;
         }
 
-        abstract protected void AlgorithmSpecificImplementation(BaseNode<T> cell);
+        abstract protected void AlgorithmSpecificImplementation(BaseNode<T> node);
     }
 }
