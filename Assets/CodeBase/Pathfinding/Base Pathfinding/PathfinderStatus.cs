@@ -1,10 +1,10 @@
-namespace Pathfinding.BasePathfinding
+﻿namespace Pathfinding.BasePathfinding
 {
     public enum PathfinderStatus
     {
         NOT_INITIALIZED,
         RUNNING,
-        SUCCSESS,
+        SUCCESS,
         FAILURE,
     }
 }

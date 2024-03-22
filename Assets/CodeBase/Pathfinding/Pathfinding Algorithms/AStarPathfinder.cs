@@ -1,32 +1,35 @@
-using Pathfinding.BasePathfinding;
+﻿using Pathfinding.BasePathfinding;
 
-namespace Pathfinding.Algorithms
+namespace GameAI
 {
-    public class AStarPathfinder<T> : BasePathfinder<T>
+    namespace PathFinding
     {
-        protected override void AlgorithmImplementation(BaseNode<T> node)
+        public class AStarPathfinder<T> : BasePathfinder<T>
         {
-            if (GetNodePositionInList(CloseList, node.Value) > -1)
-                return;
-
-            float currentMovementCost = CurrentNode.CurrentMovementCost + NodeTraversalCost(CurrentNode.ChildNode.Value, node.Value);
-
-            float heuristicCost = HeuristicCost(node.Value, TargetNode.Value);
-
-            int idOList = GetNodePositionInList(OpenList, node.Value);
-            if (idOList == -1)
+            protected override void AlgorithmSpecificImplementation(BaseNode<T> cell)
             {
-                PathfinderNode<T> n = new PathfinderNode<T>(CurrentNode, node, currentMovementCost, heuristicCost);
-                OpenList.Add(n);
-            }
-            else
-            {
-                float oldMovementCost = OpenList[idOList].CurrentMovementCost;
-
-                if (currentMovementCost < oldMovementCost)
+                if (IsInList(ClosedList, cell.Value) == -1)
                 {
-                    OpenList[idOList].ParrentNode = CurrentNode;
-                    OpenList[idOList].SetCurrentMovementCost(currentMovementCost);
+                    float G = CurrentNode.GCost + NodeTraversalCost(
+                        CurrentNode.Location.Value, cell.Value);
+
+                    float H = HeuristicCost(cell.Value, Goal.Value);
+
+                    int idOList = IsInList(OpenList, cell.Value);
+                    if (idOList == -1)
+                    {
+                        PathfinderNode<T> n = new PathfinderNode<T>(cell, CurrentNode, G, H);
+                        OpenList.Add(n);
+                    }
+                    else
+                    {
+                        float oldG = OpenList[idOList].GCost;
+                        if (G < oldG)
+                        {
+                            OpenList[idOList].Parent = CurrentNode;
+                            OpenList[idOList].SetGCost(G);
+                        }
+                    }
                 }
             }
         }

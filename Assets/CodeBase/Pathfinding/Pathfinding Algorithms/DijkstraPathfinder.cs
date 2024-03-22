@@ -1,34 +1,31 @@
-using Pathfinding.BasePathfinding;
+﻿using Pathfinding.BasePathfinding;
 
-namespace Pathfinding.Algorithms
+public class DijkstraPathfinder<T> : BasePathfinder<T>
 {
-    public class DijkstraPathfinder<T> : BasePathfinder<T>
+    protected override void AlgorithmSpecificImplementation(BaseNode<T> cell)
     {
-        protected override void AlgorithmImplementation(BaseNode<T> node)
+        if (IsInList(ClosedList, cell.Value) == -1)
         {
-            if (GetNodePositionInList(CloseList, node.Value) > -1)
-                return;
+            float G = CurrentNode.GCost + NodeTraversalCost(
+                CurrentNode.Location.Value, cell.Value);
 
-            float currentMovementCost = CurrentNode.CurrentMovementCost + NodeTraversalCost(CurrentNode.ChildNode.Value, node.Value);
+            float H = 0.0f;
 
-            float heuristicCost = 0.0f;
-
-            int idOList = GetNodePositionInList(OpenList, node.Value);
+            int idOList = IsInList(OpenList, cell.Value);
             if (idOList == -1)
             {
-                PathfinderNode<T> n = new PathfinderNode<T>(CurrentNode, node, currentMovementCost, heuristicCost);
+                PathfinderNode<T> n = new PathfinderNode<T>(cell, CurrentNode, G, H);
                 OpenList.Add(n);
             }
             else
             {
-                float oldMovementCost = OpenList[idOList].CurrentMovementCost;
-                if (currentMovementCost < oldMovementCost)
+                float oldG = OpenList[idOList].GCost;
+                if (G < oldG)
                 {
-                    OpenList[idOList].ParrentNode = CurrentNode;
-                    OpenList[idOList].SetCurrentMovementCost(currentMovementCost);
+                    OpenList[idOList].Parent = CurrentNode;
+                    OpenList[idOList].SetGCost(G);
                 }
             }
-
         }
     }
 }

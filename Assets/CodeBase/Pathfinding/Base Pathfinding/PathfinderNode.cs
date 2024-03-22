@@ -1,28 +1,28 @@
-namespace Pathfinding.BasePathfinding
+﻿namespace Pathfinding.BasePathfinding
 {
     public class PathfinderNode<T>
     {
-        public PathfinderNode<T> ParrentNode { get; set; }
-        public BaseNode<T> ChildNode { get; set; }
+        public PathfinderNode<T> Parent { get; set; }
 
-        public float TotalCost { get; private set; }
-        public float CurrentMovementCost { get; private set; }
-        public float HeuristicCost { get; private set; }
+        public BaseNode<T> Location { get; private set; }
 
-        public PathfinderNode(PathfinderNode<T> parrentNode, BaseNode<T> childNode, float currentMovementCost, float heuristicCost)
+        public float Fcost { get; private set; }
+        public float GCost { get; private set; }
+        public float Hcost { get; private set; }
+
+
+        public PathfinderNode(BaseNode<T> location, PathfinderNode<T> parent, float gCost, float hCost)
         {
-            ParrentNode = parrentNode;
-            ChildNode = childNode;
-
-            CurrentMovementCost = currentMovementCost;
-            HeuristicCost = heuristicCost;
-            TotalCost = CurrentMovementCost + HeuristicCost;
+            Location = location;
+            Parent = parent;
+            Hcost = hCost;
+            SetGCost(gCost);
         }
 
-        public void SetCurrentMovementCost(float currentMovementCost)
+        public void SetGCost(float c)
         {
-            CurrentMovementCost = currentMovementCost;
-            TotalCost = CurrentMovementCost + HeuristicCost;
+            GCost = c;
+            Fcost = GCost + Hcost;
         }
     }
 }
