@@ -11,9 +11,11 @@ public class Hexagon : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler,
     [SerializeField] private GameObject outline;
     [SerializeField] private SpriteRenderer hexagonRenderer;
 
-    public float MovementCost { get; private set; }
-    public bool IsWalkable { get; private set; }
+    public float MovementCost { get; set; }
+    public bool IsWalkable { get; set; }
 
+    [SerializeField] private HexagonData _hexagonData;
+    public HexagonData HexagonData { get => _hexagonData; set => _hexagonData = value; }
     public Hex HexData { get; set; }
     public Vector2Int Coordinate => CoordinateConversion.CubeToOffset(new Vector3Int(HexData.Q, HexData.R, HexData.S));
 

@@ -110,90 +110,20 @@ public class HexGridLayoutRenderer : MonoBehaviour
         }
     }
 
-    //public List<Hexagon> GetNeighborsList(Hexagon hexagon)
-    //{
-    //    List<Hexagon> result = new List<Hexagon>(6);
-
-    //    if (hexagon.Coordinate.x % 2 == 0)
-    //    {
-    //        // even cols
-    //        GetEvenNeigbors(hexagon.Coordinate, result);
-    //    }
-    //    else
-    //    {
-    //        // odd cols
-    //        GetOddNeigbors(hexagon.Coordinate, result);
-    //    }
-    //    result.RemoveAll(item => item == null);
-
-    //    return result;
-    //}
-
-    //private void GetEvenNeigbors(Vector2Int hexagonCoord, List<Hexagon> neighors)
-    //{
-    //    neighors.Add(GetNeighbor(new Vector2Int(hexagonCoord.x + 1, hexagonCoord.y)));
-    //    neighors.Add(GetNeighbor(new Vector2Int(hexagonCoord.x + 1, hexagonCoord.y - 1)));
-    //    neighors.Add(GetNeighbor(new Vector2Int(hexagonCoord.x, hexagonCoord.y - 1)));
-    //    neighors.Add(GetNeighbor(new Vector2Int(hexagonCoord.x - 1, hexagonCoord.y - 1)));
-    //    neighors.Add(GetNeighbor(new Vector2Int(hexagonCoord.x - 1, hexagonCoord.y)));
-    //    neighors.Add(GetNeighbor(new Vector2Int(hexagonCoord.x, hexagonCoord.y + 1)));
-    //}
-
-    //private void GetOddNeigbors(Vector2Int hexagonCoord, List<Hexagon> neighors)
-    //{
-    //    neighors.Add(GetNeighbor(new Vector2Int(hexagonCoord.x + 1, hexagonCoord.y + 1)));
-    //    neighors.Add(GetNeighbor(new Vector2Int(hexagonCoord.x + 1, hexagonCoord.y)));
-    //    neighors.Add(GetNeighbor(new Vector2Int(hexagonCoord.x, hexagonCoord.y - 1)));
-    //    neighors.Add(GetNeighbor(new Vector2Int(hexagonCoord.x - 1, hexagonCoord.y)));
-    //    neighors.Add(GetNeighbor(new Vector2Int(hexagonCoord.x - 1, hexagonCoord.y + 1)));
-    //    neighors.Add(GetNeighbor(new Vector2Int(hexagonCoord.x, hexagonCoord.y + 1)));
-    //}
-
-    //private Hexagon GetNeighbor(Vector2Int hexagonCoord)
-    //{
-    //    if (hexagonCoord.x < 0 || hexagonCoord.x >= columnCount)
-    //        return null;
-    //    if (hexagonCoord.y < 0 || hexagonCoord.y >= rowCount)
-    //        return null;
-
-    //    return _grid[hexagonCoord.x, hexagonCoord.y];
-    //}
-
-    //public List<Node<Vector2Int>> GetNeighborsList(HexNode hexNode)
-    //{
-    //    List<Node<Vector2Int>> result = new List<Node<Vector2Int>>(6);
-
-    //    if (hexNode.hexagon.Coordinate.x % 2 == 0)
-    //    {
-    //        // even cols
-    //        GetEvenNeigbors(hexNode.hexagon.Coordinate, result);
-    //    }
-    //    else
-    //    {
-    //        // odd cols
-    //        GetOddNeigbors(hexNode.hexagon.Coordinate, result);
-    //    }
-    //    result.RemoveAll(item => item == null);
-
-    //    return result;
-    //}
-
     public List<BaseNode<Vector2Int>> GetNeighborsList(HexNode hexNode)
     {
         List<BaseNode<Vector2Int>> result = new List<BaseNode<Vector2Int>>(6);
 
-        if (hexNode.hexagon.Coordinate.x % 2 == 0)
+        if (hexNode.Hexagon.Coordinate.x % 2 == 0)
         {
-            // even cols
-            GetEvenNeigbors(hexNode.hexagon.Coordinate, result);
+            GetEvenNeigbors(hexNode.Hexagon.Coordinate, result);
         }
         else
         {
-            // odd cols
-            GetOddNeigbors(hexNode.hexagon.Coordinate, result);
+            GetOddNeigbors(hexNode.Hexagon.Coordinate, result);
         }
-        result.RemoveAll(item => item == null);
 
+        result.RemoveAll(item => item == null);
         return result;
     }
 
@@ -220,9 +150,18 @@ public class HexGridLayoutRenderer : MonoBehaviour
     private BaseNode<Vector2Int> GetNeighbor(Vector2Int hexagonCoord)
     {
         if (hexagonCoord.x < 0 || hexagonCoord.x >= columnCount)
+        {
             return null;
+        }
         if (hexagonCoord.y < 0 || hexagonCoord.y >= rowCount)
+        {
             return null;
+        }
+
+        if (!_grid[hexagonCoord.x, hexagonCoord.y].IsWalkable)
+        {
+            return null;
+        }
 
         return _hexGrid[hexagonCoord.x, hexagonCoord.y];
     }

@@ -24,6 +24,8 @@ public class HexagonRenderer : MonoBehaviour
         hexagon.name = $"Hexagon [{coord.x},{coord.y}]";
 
         hexagon.DefaultColor = hexagonTypes[0].BaseColor;
+        hexagon.IsWalkable = hexagonTypes[0].IsWalkable;
+        hexagon.HexagonData = hexagonTypes[0];
         hexagon.SetTempColor(hexagon.DefaultColor);
         return hexagon;
     }
@@ -36,6 +38,8 @@ public class HexagonRenderer : MonoBehaviour
     public void ChangeBaseHexagonColor(Hexagon hex, Color baseColor)
     {
         hex.SetBaseColor(baseColor);
+        hex.HexagonData = hexagonTypes.FirstOrDefault(x => x.BaseColor == baseColor);
+        hex.IsWalkable = hex.HexagonData.IsWalkable;
     }
 
     public void ClearToDefaultColor(Hexagon hex)

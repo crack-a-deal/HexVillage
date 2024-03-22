@@ -135,7 +135,6 @@ public class HexGridDrawer : MonoBehaviour
             if (_startHex != null && _endHex != null)
             {
                 pathfinder.FindPath(_startHex, _endHex);
-                //pathfinder.SetDestination(_startHex, _endHex);
                 _startHex = null;
                 _endHex = null;
             }

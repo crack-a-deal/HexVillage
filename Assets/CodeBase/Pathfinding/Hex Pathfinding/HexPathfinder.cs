@@ -10,8 +10,6 @@ public class HexPathfinder : MonoBehaviour
 
     [SerializeField] private HexGridLayoutRenderer layoutRenderer;
 
-    //public HexNode[,] NodeGrid { get; private set; }
-
     public List<Vector2Int> Path { get; private set; } = new List<Vector2Int>();
 
     private BasePathfinder<Vector2Int> _pathfinder = new DijkstraPathfinder<Vector2Int>();
@@ -23,12 +21,6 @@ public class HexPathfinder : MonoBehaviour
 
         _pathfinder.HeuristicCost = GetManhattanCost;
         _pathfinder.NodeTraversalCost = GetEuclideanCost;
-
-        //NodeGrid = new HexNode[layoutRenderer.gridLayout.Columns, layoutRenderer.gridLayout.Rows];
-        //foreach (Hexagon hex in layoutRenderer.Grid)
-        //{
-        //    NodeGrid[hex.Coordinate.x, hex.Coordinate.y] = new HexNode(layoutRenderer, hex, hex.Coordinate);
-        //}
     }
 
     public void FindPath(Hexagon start, Hexagon end)
