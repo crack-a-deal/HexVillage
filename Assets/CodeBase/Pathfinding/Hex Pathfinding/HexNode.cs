@@ -2,24 +2,26 @@ using Pathfinding.BasePathfinding;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class HexNode : BaseNode<Vector2Int>
+namespace Pathfinding.HexPathfinding
 {
-    public Hexagon Hexagon { get; private set; }
-    public bool IsWalkable { get; private set; }
-    //public float MovementCost { get; private set; }
-    private HexGridLayoutRenderer _renderer;
-
-    public HexNode(HexGridLayoutRenderer renderer, Hexagon hexagon, Vector2Int value) : base(value)
+    public class HexNode : BaseNode<Vector2Int>
     {
-        _renderer = renderer;
-        Hexagon = hexagon;
+        public Hexagon Hexagon { get; private set; }
+        public bool IsWalkable { get; private set; }
 
-        //MovementCost = hexagon.MovementCost;
-        IsWalkable = hexagon.IsWalkable;
-    }
+        private HexGridLayoutRenderer _renderer;
 
-    public override List<BaseNode<Vector2Int>> GetNeighbours()
-    {
-        return _renderer.GetNeighborsList(this);
+        public HexNode(HexGridLayoutRenderer renderer, Hexagon hexagon, Vector2Int value) : base(value)
+        {
+            _renderer = renderer;
+            Hexagon = hexagon;
+
+            IsWalkable = hexagon.IsWalkable;
+        }
+
+        public override List<BaseNode<Vector2Int>> GetNeighbours()
+        {
+            return _renderer.GetNeighborsList(this);
+        }
     }
 }
