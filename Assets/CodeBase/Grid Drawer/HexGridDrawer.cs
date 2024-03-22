@@ -5,9 +5,6 @@ public class HexGridDrawer : MonoBehaviour
 {
     public event Action<Color> OnCurrentColorChanged;
 
-    // TODO: start point drawer
-    // TODO: end point drawer
-
     [SerializeField] private HexGridLayoutRenderer gridRenderer;
     [SerializeField] private LineDrawer lineDrawer;
     [SerializeField] private HexPathfinder pathfinder;
@@ -71,19 +68,18 @@ public class HexGridDrawer : MonoBehaviour
         toolsPanel.FindPath += ToolsPanel_FindPath;
 
         gridRenderer.UpdateGridLayout += GridRenderer_UpdateGridLayout;
-        pathfinder.OnPathFound += Pathfinder_OnPathFound;
+        pathfinder.PathFounded += Pathfinder_OnPathFound;
     }
 
     private void Pathfinder_OnPathFound()
     {
-        gridRenderer.DrawBaseLine(pathfinder.GetPath(), CurrentColor);
+        gridRenderer.DrawBaseLine(pathfinder.Path, CurrentColor);
     }
 
     private void GridRenderer_UpdateGridLayout()
     {
         if (!isPathfinding)
             return;
-
     }
 
     private void Start()
@@ -138,9 +134,8 @@ public class HexGridDrawer : MonoBehaviour
             }
             if (_startHex != null && _endHex != null)
             {
-                pathfinder.SetDestination(_startHex, _endHex);
-                gridRenderer.DrawBaseLine(pathfinder.GetPath(), CurrentColor);
-
+                pathfinder.FindPath(_startHex, _endHex);
+                //pathfinder.SetDestination(_startHex, _endHex);
                 _startHex = null;
                 _endHex = null;
             }

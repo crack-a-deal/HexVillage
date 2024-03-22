@@ -9,7 +9,7 @@ public class HexagonRenderer : MonoBehaviour
     [SerializeField] private Color hexagonBaseColor;
 
     [Space]
-    [SerializeField] private HexagonColor[] hexagonTypes;
+    [SerializeField] private HexagonData[] hexagonTypes;
     private Dictionary<HexagonType, Color> hexagonTypesDictionary;
 
     private void Awake()

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-//TODO: ? mb child from hexGridDrawer
 public class LineDrawer : MonoBehaviour
 {
     public List<Vector2Int> GetLinePath(Hexagon startHexagon, Hexagon targetHexagon)

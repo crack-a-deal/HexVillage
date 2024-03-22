@@ -17,26 +17,20 @@ public struct Hex
         S = s;
     }
 
-    //TODO: use + operator
-    Hex Add(Hex firstHex, Hex secondHex)
-    {
-        return new Hex(firstHex.Q + secondHex.Q, firstHex.R + secondHex.R, firstHex.S + secondHex.S);
-    }
+    public static Hex operator +(Hex firstHex, Hex secondHex)
+        => new Hex(firstHex.Q + secondHex.Q, firstHex.R + secondHex.R, firstHex.S + secondHex.S);
 
-    //TODO: use - operator
-    Hex Subtract(Hex firstHex, Hex secondHex)
-    {
-        return new Hex(firstHex.Q - secondHex.Q, firstHex.R - secondHex.R, firstHex.S - secondHex.S);
-    }
+    public static Hex operator -(Hex firstHex, Hex secondHex)
+        => new Hex(firstHex.Q - secondHex.Q, firstHex.R - secondHex.R, firstHex.S - secondHex.S);
 
-    int Length(Hex hex)
+    public static int Length(Hex hex)
     {
         return ((Mathf.Abs(hex.Q) + Mathf.Abs(hex.R) + Mathf.Abs(hex.S)) / 2);
     }
 
-    int Distance(Hex firstHex, Hex secondHex)
+    public static int Distance(Hex firstHex, Hex secondHex)
     {
-        return Length(Subtract(firstHex, secondHex));
+        return Length(firstHex - secondHex);
     }
 
     public static Hex HexDirection(int direction)
@@ -59,7 +53,7 @@ public struct Hex
 
     public static Hex Neighbor(Hex hex, int direction)
     {
-        return hex.Add(hex, HexDirection(direction));
+        return hex + HexDirection(direction);
     }
 
     public static Hex[] Neighbors(Hex hex)
@@ -67,7 +61,7 @@ public struct Hex
         Hex[] result = new Hex[6];
         for (int i = 0; i < 6; i++)
         {
-            result[i]=hex.Add(hex,HexDirection(i));
+            result[i] = hex + HexDirection(i);
         }
         return result;
     }
