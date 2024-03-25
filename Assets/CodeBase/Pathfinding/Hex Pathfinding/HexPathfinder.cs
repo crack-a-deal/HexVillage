@@ -1,3 +1,4 @@
+using HexagonGrid;
 using Pathfinding.BasePathfinding;
 using System;
 using System.Collections;
@@ -16,13 +17,22 @@ namespace Pathfinding.HexPathfinding
 
         private BasePathfinder<Vector2Int> _pathfinder = new DijkstraPathfinder<Vector2Int>();
 
+        private HexNode[,] _nodesGrid;
+
         private void Start()
         {
+            _nodesGrid = new HexNode[layoutRenderer.GridLayout.Columns, layoutRenderer.GridLayout.Rows];
             _pathfinder.onSuccess = OnSuccessPathFinding;
             _pathfinder.onFailure = OnFailurePathFinding;
 
             _pathfinder.HeuristicCost = GetManhattanCost;
             _pathfinder.NodeTraversalCost = GetEuclideanCost;
+
+            foreach (Hex hex in layoutRenderer.GridLayout.Grid)
+            {
+                Vector2Int offsetCoordination = CoordinateConversion.CubeToOffset(new Vector3Int(hex.Q, hex.R, hex.S));
+                _nodesGrid[offsetCoordination.x, offsetCoordination.y] = new HexNode(this, layoutRenderer.GetHexagon(offsetCoordination), offsetCoordination);
+            }
         }
 
         public void FindPath(Hexagon start, Hexagon end)
@@ -33,8 +43,8 @@ namespace Pathfinding.HexPathfinding
                 return;
             }
 
-            HexNode startNode = new HexNode(layoutRenderer, start, start.Coordinate);
-            HexNode endNode = new HexNode(layoutRenderer, end, end.Coordinate);
+            HexNode startNode = new HexNode(this, start, start.Coordinate);
+            HexNode endNode = new HexNode(this, end, end.Coordinate);
 
             _pathfinder.Initialize(startNode, endNode);
             StartCoroutine(Coroutine_FindPathSteps());
@@ -47,6 +57,22 @@ namespace Pathfinding.HexPathfinding
                 _pathfinder.Step();
                 yield return null;
             }
+        }
+
+        public List<BaseNode<Vector2Int>> GetNeighborsNodeList(Hex hex)
+        {
+            List<Hex> hexes = layoutRenderer.GridLayout.GetNeighborsList(hex);
+            List<BaseNode<Vector2Int>> result = new List<BaseNode<Vector2Int>>(6);
+
+            foreach (var item in hexes)
+            {
+                if (layoutRenderer.CheckHexagon(item.OffsetCoordinates))
+                {
+                    result.Add(_nodesGrid[item.OffsetCoordinates.x, item.OffsetCoordinates.y]);
+                }
+            }
+
+            return result;
         }
 
         private void OnFailurePathFinding()

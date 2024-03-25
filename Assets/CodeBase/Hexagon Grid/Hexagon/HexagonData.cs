@@ -4,6 +4,6 @@
 public class HexagonData
 {
     public HexagonType HexagonType;
-    public Color BaseColor;
+    public Color Color;
     public bool IsWalkable;
 }
