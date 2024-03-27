@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace HexagonGrid
 {
-    [RequireComponent(typeof(HexagonRenderer))]
     public class HexGridLayoutRenderer : MonoBehaviour
     {
         public event Action UpdateGridLayout;
@@ -14,7 +14,10 @@ namespace HexagonGrid
         [SerializeField] private int rowCount;
 
         [Space]
-        [SerializeField] private HexagonRenderer hexagonRenderer;
+        [Header("Hexagon Setting")]
+        [SerializeField] private Hexagon hexagonPrefab;
+        [SerializeField] private HexagonData[] hexagonTypes;
+
         public HexGridLayout GridLayout { get; private set; } = new HexGridLayout();
 
         public Hexagon[,] Grid => _hexagonsGrid;
@@ -26,6 +29,7 @@ namespace HexagonGrid
             RenderGrid();
         }
 
+        #region Grid
         private void RenderGrid()
         {
             _hexagonsGrid = new Hexagon[columnCount, rowCount];
@@ -33,8 +37,8 @@ namespace HexagonGrid
             foreach (Hex hex in GridLayout.Grid)
             {
                 Vector2Int offsetCoordination = CoordinateConversion.CubeToOffset(new Vector3Int(hex.Q, hex.R, hex.S));
-                Hexagon hexagon = hexagonRenderer.CreateHex(offsetCoordination);
-                hexagon.HexData = hex;
+
+                Hexagon hexagon = CreateHexagon(offsetCoordination, hex);
                 hexagon.transform.position = GetHexagonPositionFromCoordinates(offsetCoordination) + (Vector2)transform.position;
                 _hexagonsGrid[offsetCoordination.x, offsetCoordination.y] = hexagon;
             }
@@ -54,6 +58,22 @@ namespace HexagonGrid
             rowPosition *= /*isEvenColum ? 1 :*/ -1;
             return new Vector2(colPosition, rowPosition);
         }
+        #endregion
+
+        #region Hexagon
+        private Hexagon CreateHexagon(Vector2Int coord, Hex hex)
+        {
+            Hexagon hexagon = Instantiate(hexagonPrefab, transform);
+            hexagon.name = $"Hexagon [{coord.x},{coord.y}]";
+
+            hexagon.DefaultColor = hexagonTypes[0].Color;
+            hexagon.IsWalkable = hexagonTypes[0].IsWalkable;
+            hexagon.HexagonData = hexagonTypes[0];
+
+            hexagon.HexData = hex;
+
+            return hexagon;
+        }
 
         public Hexagon GetHexagon(Vector2Int coordinates)
         {
@@ -62,58 +82,73 @@ namespace HexagonGrid
 
         public bool CheckHexagon(Vector2Int coordinates)
         {
-            return Grid[coordinates.x,coordinates.y].IsWalkable;
+            return Grid[coordinates.x, coordinates.y].IsWalkable;
         }
-            
+
+        private void SetColor(Hexagon hex, Color color)
+        {
+            hex.BaseColor = color;
+            hex.HexagonData = GetHexagonData(color);
+            hex.IsWalkable = hex.HexagonData.IsWalkable;
+        }
+
+        public HexagonData GetHexagonData(Color color)
+        {
+            return hexagonTypes.FirstOrDefault(x => x.Color == color);
+        }
+
+        public Color GetColor(HexagonType type)
+        {
+            return hexagonTypes.FirstOrDefault(x => x.HexagonType == type).Color;
+        }
+
+        public HexagonType GetType(Color color)
+        {
+            return hexagonTypes.FirstOrDefault(x => x.Color == color).HexagonType;
+        }
+        #endregion
 
         #region Render Methods
-        public void ClearFrame()
+        public void Draw(List<Vector2Int> list, Color color)
         {
-            foreach (Hexagon hex in _hexagonsGrid)
+            foreach (Vector2Int hex in list)
             {
-                hexagonRenderer.ClearToBaseColor(hex);
+                SetColor(_hexagonsGrid[hex.x, hex.y], color);
             }
             UpdateGridLayout?.Invoke();
         }
 
-        public void ClearToDefault()
+        public void Draw(Color color)
         {
-            foreach (Hexagon hex in _hexagonsGrid)
+            foreach (Hexagon item in _hexagonsGrid)
             {
-                hexagonRenderer.ClearToDefaultColor(hex);
+                SetColor(item, color);
             }
             UpdateGridLayout?.Invoke();
         }
 
-        public void ChangeTempHexColor(Hexagon hex, Color color)
+        public void Draw(Hexagon hex, Color color)
         {
-            hexagonRenderer.ChangeTempHexagonColor(hex, color);
+            SetColor(hex, color);
             UpdateGridLayout?.Invoke();
         }
 
-        public void ChangeBaseHexColor(Hexagon hex, Color color)
+        public void Clear(List<Vector2Int> list, Color color)
         {
-            hexagonRenderer.ChangeBaseHexagonColor(hex, color);
+            foreach (Vector2Int hex in list)
+            {
+                SetColor(_hexagonsGrid[hex.x, hex.y], _hexagonsGrid[hex.x, hex.y].DefaultColor);
+            }
             UpdateGridLayout?.Invoke();
         }
 
-        public Color GetColor(HexagonType type) => hexagonRenderer.GetColorFromType(type);
-
-        public void DrawLine(List<Vector2Int> path, Color color)
+        public void Clear(Color color)
         {
-            ClearFrame();
-            foreach (var hex in path)
+            foreach (Hexagon item in _hexagonsGrid)
             {
-                // TODO: fix IndexOutOfRangeException
-                ChangeTempHexColor(_hexagonsGrid[hex.x, hex.y], color);
+                SetColor(item, color);
             }
-        }
-        public void DrawBaseLine(List<Vector2Int> path, Color color)
-        {
-            foreach (var hex in path)
-            {
-                ChangeBaseHexColor(_hexagonsGrid[hex.x, hex.y], color);
-            }
+            UpdateGridLayout?.Invoke();
         }
         #endregion
     }

@@ -19,19 +19,19 @@ namespace HexagonGrid
         public Hex HexData { get; set; }
         public Vector2Int Coordinate => CoordinateConversion.CubeToOffset(new Vector3Int(HexData.Q, HexData.R, HexData.S));
 
-        private Color _defaultColor;
-        public Color DefaultColor
+        //TODO: private set
+        public Color DefaultColor { get; set; }
+
+        private Color _baseColor;
+        public Color BaseColor
         {
-            get => _defaultColor;
+            get => _baseColor;
             set
             {
-                _defaultColor = value;
-                BaseColor = _defaultColor;
-                //TempColor = _defaultColor;
+                _baseColor = value;
+                hexagonRenderer.color = _baseColor;
             }
         }
-        public Color BaseColor { get; set; }
-        //public Color TempColor { get; set; }
 
         #region Pointers
         public void OnPointerEnter(PointerEventData eventData)
@@ -55,18 +55,6 @@ namespace HexagonGrid
         private void ActiveOutline(bool isActive)
         {
             outline.SetActive(isActive);
-        }
-
-        public void SetTempColor(Color color)
-        {
-            //TempColor = color;
-            hexagonRenderer.color = color;
-        }
-
-        public void SetBaseColor(Color color)
-        {
-            BaseColor = color;
-            hexagonRenderer.color = color;
         }
     }
 }

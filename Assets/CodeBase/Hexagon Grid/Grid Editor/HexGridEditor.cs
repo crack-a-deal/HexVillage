@@ -20,22 +20,6 @@ namespace HexagonGrid.GridEditor
         private Hexagon _startHex;
         private Hexagon _endHex;
 
-        private Hexagon _selectedHexagon;
-        public Hexagon SelectedHexagon
-        {
-            get
-            {
-                return _selectedHexagon;
-            }
-            private set
-            {
-                if (_selectedHexagon != value)
-                {
-                    _selectedHexagon = value;
-                }
-            }
-        }
-
         private HexagonType _hexagonType = HexagonType.None;
         public HexagonType HexagonType
         {
@@ -77,7 +61,7 @@ namespace HexagonGrid.GridEditor
 
         private void Pathfinder_OnPathFound()
         {
-            gridRenderer.DrawBaseLine(pathfinder.Path, CurrentColor);
+            gridRenderer.Draw(pathfinder.Path, CurrentColor);
         }
 
         private void GridRenderer_UpdateGridLayout()
@@ -91,79 +75,56 @@ namespace HexagonGrid.GridEditor
             foreach (Hexagon hex in gridRenderer.Grid)
             {
                 hex.Select += Hex_Select;
-                hex.PointerEnter += Hex_PointerEnter;
-            }
-        }
-
-        private void Hex_PointerEnter(Hexagon hex)
-        {
-            if (isDrawLine)
-            {
-                if (_startHex != null)
-                {
-                    _endHex = hex;
-                    gridRenderer.DrawLine(lineDrawer.GetLinePath(_startHex, _endHex), CurrentColor);
-                }
-            }
-            else if (isPathfinding)
-            {
-                if (_startHex != null)
-                {
-                    _endHex = hex;
-                }
             }
         }
 
         private void Hex_Select(Hexagon hex)
         {
-            if (isDrawLine)
+            if (isDrawLine || isPathfinding)
             {
                 if (_startHex == null)
                 {
                     _startHex = hex;
                     return;
                 }
-                if (_startHex != null && _endHex != null)
+                else
                 {
-                    gridRenderer.DrawBaseLine(lineDrawer.GetLinePath(_startHex, _endHex), CurrentColor);
-                    _startHex = null;
-                    _endHex = null;
-                }
-            }
-            else if (isPathfinding)
-            {
-                if (_startHex == null)
-                {
-                    _startHex = hex;
-                    return;
-                }
-                if (_startHex != null && _endHex != null)
-                {
-                    pathfinder.FindPath(_startHex, _endHex);
+                    _endHex = hex;
+
+                    if (isDrawLine)
+                    {
+                        gridRenderer.Draw(lineDrawer.GetLinePath(_startHex, _endHex), CurrentColor);
+                    }
+                    else if (isPathfinding)
+                    {
+                        pathfinder.FindPath(_startHex, _endHex);
+                    }
+
                     _startHex = null;
                     _endHex = null;
                 }
             }
             else
             {
-                _selectedHexagon = hex;
-                gridRenderer.ChangeBaseHexColor(hex, CurrentColor);
+                gridRenderer.Draw(hex, CurrentColor);
             }
         }
 
         private void ToolsPanel_ClearField()
         {
-            gridRenderer.ClearToDefault();
+            gridRenderer.Clear(CurrentColor);
         }
 
         private void ToolsPanel_DrawLine()
         {
             isDrawLine = !isDrawLine;
+            isPathfinding = false;
         }
 
         private void ToolsPanel_FindPath()
         {
             isPathfinding = !isPathfinding;
+            isDrawLine = false;
         }
 
         private void ToolsPanel_ChangeHexagonType(HexagonType type)
